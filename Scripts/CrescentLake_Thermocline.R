@@ -25,6 +25,15 @@ library(tidyverse)
 install.packages("ggplot2")
 library(ggplot2)
 
+install.packages("ggthemes")
+library(ggthemes)
+
+install.packages("gganimate")
+library(gganimate)
+
+install.packages("maps")
+library(maps)
+
 install.packages("lubridate")
 library(lubridate)
 
@@ -81,25 +90,16 @@ daily_avg_temp$Month <-format(daily_avg_temp$Date, "%m")
 monthly_avg_temp <- aggregate(Temp ~ Month + Depth, data = daily_avg_temp, FUN = mean, na.rm = TRUE)
 
 #Plot Temperature data
-ggplot(TempData, aes(x = Date, y = Depth, colour = Temp)) +
-  geom_point() +
-  scale_y_reverse() +
-  scale_colour_gradient2(
-    midpoint = 5.5, 
-    high = scales::muted("red"), 
-    low = scales::muted("blue")
-    )
-
-ggplot(daily_avg_temp, aes(Date, Depth, fill = Temp)) +
+ggplot(TempData, aes(Date, Depth, fill = Temp)) +
   geom_raster() +
   scale_y_reverse() +
   scale_fill_gradient2(
-    midpoint = 5, 
-    high = scales::muted("red"), 
-    low = scales::muted("blue")
-  ) +
+  midpoint = 8, 
+  high = scales::muted("red"), 
+  low = scales::muted("blue")) +
   coord_cartesian(expand = FALSE)
 
+# Monthly Temperature Profiles Symbolized by Temperature
 MonthLabel = c("February","March","April","May","June","July","August","September","October")
 names(MonthLabel) = c("02","03","04","05","06","07","08","09","10")
 
@@ -115,6 +115,32 @@ daily_avg_temp %>% ggplot(aes(x = Temp, y = Depth, colour = Temp)) +
        y = "Depth (meters)",
        x = "Temperature (C)") + theme_bw(base_size = 15)
 
+# Monthly Temperature Profiles Symbolized by Date
+daily_avg_temp %>% ggplot(aes(x = Temp, y = Depth, colour = as.factor(Date))) +
+  geom_point() +
+  scale_y_reverse() +
+  facet_wrap( ~ Month, labeller = labeller(Month = MonthLabel)) +
+  labs(title = "Monthly Temperature Profiles - Crescent Lake, Alaska",
+       subtitle = "February to October 2024",
+       y = "Depth (meters)",
+       x = "Temperature (C)") + 
+       theme_bw(base_size = 15) +
+       theme(legend.position = "none")
+
+#Animated Time Series of daily temperature profiles#
+daily_avg_temp %>% ggplot(aes(x = Temp, y = Depth, colour = as.factor(Date))) +
+  geom_point() +
+  scale_y_reverse() +
+  facet_wrap( ~ Month, labeller = labeller(Month = MonthLabel)) +
+  labs(title = "Monthly Temperature Profiles - Crescent Lake, Alaska",
+       subtitle = "February to October 2024",
+       y = "Depth (meters)",
+       x = "Temperature (C)") + 
+  theme_bw(base_size = 15) +
+  theme(legend.position = "none")
+
+
+#
 ggplot(CrescentLake_Flow, aes(x = Date2, y = CFS, group = Year, colour = as.factor(Year))) +
   geom_line() +
   geom_line(size = 1) +
@@ -125,8 +151,4 @@ ggplot(CrescentLake_Flow, aes(x = Date2, y = CFS, group = Year, colour = as.fact
   ggtitle("Stream Discharge (CFS) from Crescent Lake, Alaska") +
   xlab("Date") + ylab("Discharge (Cubic Feet per Second)")
 
-ggplot(CrescentCreek_Flow, aes(x = Date2, y = CFS, group = Year, colour = Year)) +
-  geom_line() +
-  scale_x_date() +
-  ggtitle("Stream Discharge (CFS) for Crescent Creek, Alaska") +
-  xlab("Date") + ylab("Discharge (Cubic Feet per Second)")
+
