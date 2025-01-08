@@ -12,32 +12,34 @@ require(remotes)
 remotes::install_github("robertladwig/LakeModelR")
 
 install.packages("LakeModelR")
+
+install.packages("rLakeAnalyzer")
+
+install.packages("tidyverse")
+
+install.packages("dplyr")
+
+install.packages("ggplot2")
+
+install.packages("ggthemes")
+
+install.packages("gganimate")
+
+install.packages("lubridate")
+
+install.packages("zoo")
+
 library(LakeModelR)
 require(tidyverse)
 require(plyr)
-
-install.packages("rLakeAnalyzer")
 library(rLakeAnalyzer)
-
-install.packages("tidyverse")
 library(tidyverse)
-
-install.packages("ggplot2")
+library(dplyr)
 library(ggplot2)
-
-install.packages("ggthemes")
 library(ggthemes)
-
-install.packages("gganimate")
 library(gganimate)
-
-install.packages("maps")
 library(maps)
-
-install.packages("lubridate")
 library(lubridate)
-
-install.packages("zoo")
 library(zoo)
 
 ##Transform raw data from wide format to long format for analysis##
@@ -128,19 +130,22 @@ daily_avg_temp %>% ggplot(aes(x = Temp, y = Depth, colour = as.factor(Date))) +
        theme(legend.position = "none")
 
 #Animated Time Series of daily temperature profiles#
-daily_avg_temp %>% ggplot(aes(x = Temp, y = Depth, colour = as.factor(Date))) +
+daily_avg_temp %>% ggplot(aes(x = Temp, y = Depth, colour = as.factor(Temp))) +
   geom_point() +
   scale_y_reverse() +
-  facet_wrap( ~ Month, labeller = labeller(Month = MonthLabel)) +
+  scale_colour_gradient2(
+    midpoint = 8,
+    high = "red", mid = "purple", low = "blue", space = "Lab")+
   labs(title = "Monthly Temperature Profiles - Crescent Lake, Alaska",
        subtitle = "February to October 2024",
        y = "Depth (meters)",
        x = "Temperature (C)") + 
   theme_bw(base_size = 15) +
-  theme(legend.position = "none")
+  theme(legend.position = "none") +
+  #transition_time(Date)
+  #ease_aes("linear")
 
-
-#
+#Plot Crescent Lake Outflow#
 ggplot(CrescentLake_Flow, aes(x = Date2, y = CFS, group = Year, colour = as.factor(Year))) +
   geom_line() +
   geom_line(size = 1) +
@@ -150,5 +155,3 @@ ggplot(CrescentLake_Flow, aes(x = Date2, y = CFS, group = Year, colour = as.fact
   labs(colour = "Year") +
   ggtitle("Stream Discharge (CFS) from Crescent Lake, Alaska") +
   xlab("Date") + ylab("Discharge (Cubic Feet per Second)")
-
-
